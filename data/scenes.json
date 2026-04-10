@@ -1,0 +1,89 @@
+{
+  "outer_square": {
+    "id": "outer_square",
+    "name": "青云峰·外门广场",
+    "description": "这里是青云峰的外门广场，云雾缭绕，几名外门弟子正在此处切磋。空气中弥漫着淡淡的灵气。",
+    "safe_zone": true,
+    "environment": "mountain",
+    "level_range": [
+      1,
+      5
+    ],
+    "exits": {
+      "east": "mountain_path",
+      "north": "herb_garden"
+    },
+    "entities": [
+      {
+        "template_id": "npc_jiandong",
+        "type": "npc",
+        "visible": true
+      },
+      {
+        "template_id": "item_lingshi_fragment",
+        "type": "item",
+        "quantity": 3,
+        "visible": true
+      },
+      {
+        "template_id": "item_huiqi_dan",
+        "type": "item",
+        "quantity": 2,
+        "visible": true
+      }
+    ]
+  },
+  "mountain_path": {
+    "id": "mountain_path",
+    "name": "内门山道",
+    "description": "通往内门的崎岖山道，两旁古木参天，偶尔能听到灵兽的啼鸣。",
+    "safe_zone": true,
+    "environment": "mountain",
+    "level_range": [
+      3,
+      8
+    ],
+    "exits": {
+      "west": "outer_square",
+      "north": "qingyunfeng_1"
+    },
+    "entities": []
+  },
+  "herb_garden": {
+    "id": "herb_garden",
+    "name": "灵药圃",
+    "description": "这里种植着各种珍稀灵药，药香扑鼻。一名老者正弯腰打理着药草。",
+    "safe_zone": true,
+    "environment": "mountain",
+    "level_range": [
+      1,
+      10
+    ],
+    "exits": {
+      "south": "outer_square"
+    },
+    "entities": [
+      {
+        "template_id": "npc_yaoyuan_elder",
+        "type": "npc",
+        "visible": true
+      },
+      {
+        "template_id": "npc_jiandong",
+        "type": "npc",
+        "visible": true
+      }
+    ]
+  },
+  "qingyunfeng_1": {
+    "id": "qingyunfeng_1",
+    "name": "青云峰·演武场",
+    "description": "123",
+    "safe_zone": true,
+    "environment": "mountain",
+    "exits": {
+      "south": "mountain_path"
+    },
+    "entities": []
+  }
+}

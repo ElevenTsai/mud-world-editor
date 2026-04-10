@@ -1,0 +1,40 @@
+{
+  "item_lingshi_fragment": {
+    "id": "item_lingshi_fragment",
+    "name": "灵石碎片",
+    "type": "item",
+    "description": "散发着微弱光芒的灵石碎片，可用于修炼或交易。",
+    "tags": [
+      "材料",
+      "货币"
+    ],
+    "visible": true,
+    "rarity": "common",
+    "stackable": true,
+    "max_stack": 999,
+    "value": 5,
+    "weight": 0.1,
+    "usable": false
+  },
+  "item_huiqi_dan": {
+    "id": "item_huiqi_dan",
+    "name": "回气丹",
+    "type": "item",
+    "description": "一颗散发着药香的丹药，服用后可恢复一定量的法力。",
+    "tags": [
+      "丹药",
+      "消耗品"
+    ],
+    "visible": true,
+    "rarity": "uncommon",
+    "stackable": true,
+    "max_stack": 20,
+    "value": 30,
+    "weight": 0.05,
+    "usable": true,
+    "effect": {
+      "type": "restore_mp",
+      "value": 20
+    }
+  }
+}
