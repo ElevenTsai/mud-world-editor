@@ -48,9 +48,42 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
 
   const positions: Record<string, { x: number; y: number }> = {};
   const visited = new Set<string>();
-  const queue: string[] = [sceneIds[0]];
-  positions[sceneIds[0]] = { x: 400, y: 360 };
+  const occupiedPositions = new Set<string>();
+
+  const posKey = (x: number, y: number) => `${x},${y}`;
+
+  // Find the nearest unoccupied grid position via spiral search
+  const findFreePosition = (idealX: number, idealY: number): { x: number; y: number } => {
+    if (!occupiedPositions.has(posKey(idealX, idealY))) {
+      return { x: idealX, y: idealY };
+    }
+    const stepX = DIRECTION_OFFSETS.east.x;  // 260
+    const stepY = DIRECTION_OFFSETS.south.y; // 180
+    for (let ring = 1; ring <= 10; ring++) {
+      for (let dx = -ring; dx <= ring; dx++) {
+        for (let dy = -ring; dy <= ring; dy++) {
+          if (Math.abs(dx) !== ring && Math.abs(dy) !== ring) continue;
+          const cx = idealX + dx * stepX;
+          const cy = idealY + dy * stepY;
+          if (!occupiedPositions.has(posKey(cx, cy))) {
+            return { x: cx, y: cy };
+          }
+        }
+      }
+    }
+    return { x: idealX + Math.random() * 100, y: idealY + Math.random() * 100 };
+  };
+
+  const placeNode = (id: string, x: number, y: number) => {
+    const free = findFreePosition(x, y);
+    positions[id] = free;
+    occupiedPositions.add(posKey(free.x, free.y));
+  };
+
+  const startPos = { x: 400, y: 360 };
+  placeNode(sceneIds[0], startPos.x, startPos.y);
   visited.add(sceneIds[0]);
+  const queue: string[] = [sceneIds[0]];
 
   while (queue.length > 0) {
     const currentId = queue.shift()!;
@@ -60,7 +93,7 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
     for (const [dir, targetId] of Object.entries(scene.exits)) {
       if (targetId && !visited.has(targetId) && scenes[targetId]) {
         const offset = DIRECTION_OFFSETS[dir as Direction];
-        positions[targetId] = { x: pos.x + offset.x, y: pos.y + offset.y };
+        placeNode(targetId, pos.x + offset.x, pos.y + offset.y);
         visited.add(targetId);
         queue.push(targetId);
       }
@@ -68,11 +101,11 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
   }
 
   // Place any unreachable scenes below
-  let offsetX = 0;
+  let unreachableX = 0;
   for (const id of sceneIds) {
     if (!visited.has(id)) {
-      positions[id] = { x: offsetX, y: 700 };
-      offsetX += 300;
+      placeNode(id, unreachableX, 700);
+      unreachableX += 300;
     }
   }
 

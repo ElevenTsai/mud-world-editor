@@ -17,6 +17,8 @@ import '@xyflow/react/dist/style.css';
 
 import { SceneNode } from './components/SceneNode';
 import { SceneEditor } from './components/SceneEditor';
+import { NpcEditor } from './components/NpcEditor';
+import { ItemEditor } from './components/ItemEditor';
 import { Toolbar } from './components/Toolbar';
 import {
   scenesToFlow,
@@ -24,8 +26,11 @@ import {
   OPPOSITE_DIRECTION,
 } from './utils/mapConverter';
 import { DEFAULT_WORLD } from './utils/defaultScenes';
+import { loadWorld } from './lib/db';
 import type { Scene, Direction, NpcTemplate, ItemTemplate, WorldData } from './types/map';
 import './App.css';
+
+type ActivePanel = 'scene' | 'npcs' | 'items' | null;
 
 const nodeTypes = { sceneNode: SceneNode };
 
@@ -37,12 +42,12 @@ function App() {
   const [npcs, setNpcs] = useState<Record<string, NpcTemplate>>({});
   const [items, setItems] = useState<Record<string, ItemTemplate>>({});
   const [loading, setLoading] = useState(true);
+  const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const idCounter = useRef(1);
 
-  // Load world data from data/ on startup
+  // Load world data from Supabase on startup
   useEffect(() => {
-    fetch('/api/load-world')
-      .then((res) => res.json())
+    loadWorld()
       .then((data: WorldData) => {
         const flow = scenesToFlow(data.scenes);
         setNodes(flow.nodes);
@@ -183,10 +188,12 @@ function App() {
       if (prev !== node.id) setEditorKey((k) => k + 1);
       return node.id;
     });
+    setActivePanel('scene');
   }, []);
 
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null);
+    setActivePanel(null);
   }, []);
 
   const addScene = useCallback(() => {
@@ -311,6 +318,24 @@ function App() {
     };
   }, [nodes, edges, npcs, items]);
 
+  const showNpcPanel = useCallback(() => {
+    setSelectedNodeId(null);
+    setActivePanel('npcs');
+  }, []);
+
+  const showItemPanel = useCallback(() => {
+    setSelectedNodeId(null);
+    setActivePanel('items');
+  }, []);
+
+  const updateNpcs = useCallback((newNpcs: Record<string, NpcTemplate>) => {
+    setNpcs(newNpcs);
+  }, []);
+
+  const updateItems = useCallback((newItems: Record<string, ItemTemplate>) => {
+    setItems(newItems);
+  }, []);
+
   if (loading) {
     return (
       <div className="editor-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -324,6 +349,8 @@ function App() {
       <Toolbar
         onAddScene={addScene}
         onExport={handleExport}
+        onShowNpcs={showNpcPanel}
+        onShowItems={showItemPanel}
       />
       <div className="editor-main">
         <div className="flow-container">
@@ -362,7 +389,7 @@ function App() {
             />
           </ReactFlow>
         </div>
-        {selectedNode && (
+        {activePanel === 'scene' && selectedNode && (
           <SceneEditor
             key={editorKey}
             scene={selectedNode.data.scene as Scene}
@@ -371,7 +398,21 @@ function App() {
             onUpdate={(scene) => updateScene(selectedNode.id, scene)}
             onDeleteExit={(dir) => deleteExit(selectedNode.id, dir)}
             onDelete={() => deleteScene(selectedNode.id)}
-            onClose={() => setSelectedNodeId(null)}
+            onClose={() => { setSelectedNodeId(null); setActivePanel(null); }}
+          />
+        )}
+        {activePanel === 'npcs' && (
+          <NpcEditor
+            npcs={npcs}
+            onUpdateNpcs={updateNpcs}
+            onClose={() => setActivePanel(null)}
+          />
+        )}
+        {activePanel === 'items' && (
+          <ItemEditor
+            items={items}
+            onUpdateItems={updateItems}
+            onClose={() => setActivePanel(null)}
           />
         )}
       </div>

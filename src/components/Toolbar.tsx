@@ -1,27 +1,27 @@
+import { useState } from 'react';
 import type { WorldData } from '../types/map';
+import { saveWorld } from '../lib/db';
 
 interface ToolbarProps {
   onAddScene: () => void;
   onExport: () => WorldData;
+  onShowNpcs: () => void;
+  onShowItems: () => void;
 }
 
-export function Toolbar({ onAddScene, onExport }: ToolbarProps) {
-  const handleSaveLocal = async () => {
+export function Toolbar({ onAddScene, onExport, onShowNpcs, onShowItems }: ToolbarProps) {
+  const [saving, setSaving] = useState(false);
+
+  const handleSaveToDb = async () => {
+    setSaving(true);
     try {
       const worldData = onExport();
-      const res = await fetch('/api/save-world', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenes: worldData.scenes }),
-      });
-      const json = await res.json() as { ok: boolean; error?: string };
-      if (json.ok) {
-        alert('已保存到 data/scenes.json');
-      } else {
-        alert(`保存失败: ${json.error ?? '未知错误'}`);
-      }
+      await saveWorld(worldData);
+      alert('已保存到数据库');
     } catch (err) {
       alert(`保存失败: ${(err as Error).message}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -35,12 +35,19 @@ export function Toolbar({ onAddScene, onExport }: ToolbarProps) {
           <button className="toolbar-btn" onClick={onAddScene}>
             + 添加场景
           </button>
+          <button className="toolbar-btn" onClick={onShowNpcs}>
+            📋 NPC 模板
+          </button>
+          <button className="toolbar-btn" onClick={onShowItems}>
+            📦 物品模板
+          </button>
           <button
             className="toolbar-btn primary"
-            onClick={handleSaveLocal}
-            title="保存场景数据到项目 data/scenes.json（仅开发模式可用）"
+            onClick={handleSaveToDb}
+            disabled={saving}
+            title="保存全部数据到 Supabase 数据库"
           >
-            💾 保存到本地
+            {saving ? '⏳ 保存中...' : '💾 保存到数据库'}
           </button>
         </div>
       </div>

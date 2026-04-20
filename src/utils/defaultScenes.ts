@@ -52,7 +52,6 @@ export const DEFAULT_WORLD: WorldData = {
     npc_jiandong: {
       id: 'npc_jiandong',
       name: '剑童',
-      type: 'npc',
       description: '一个背着木剑的小童，眼神清澈。',
       tags: ['可交互'],
       visible: true,
@@ -72,7 +71,6 @@ export const DEFAULT_WORLD: WorldData = {
     npc_yaoyuan_elder: {
       id: 'npc_yaoyuan_elder',
       name: '药园长老',
-      type: 'npc',
       description: '面容慈祥的老者，身上带着浓郁的药香。',
       tags: ['可交互', '商人'],
       visible: true,
@@ -94,7 +92,6 @@ export const DEFAULT_WORLD: WorldData = {
     item_lingshi_fragment: {
       id: 'item_lingshi_fragment',
       name: '灵石碎片',
-      type: 'item',
       description: '散发着微弱光芒的灵石碎片，可用于修炼或交易。',
       tags: ['材料', '货币'],
       visible: true,
@@ -108,7 +105,6 @@ export const DEFAULT_WORLD: WorldData = {
     item_huiqi_dan: {
       id: 'item_huiqi_dan',
       name: '回气丹',
-      type: 'item',
       description: '一颗散发着药香的丹药，服用后可恢复一定量的法力。',
       tags: ['丹药', '消耗品'],
       visible: true,

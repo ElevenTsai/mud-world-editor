@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { Scene, SceneEntityRef, Direction, NpcTemplate, ItemTemplate } from '../types/map';
+import type { Scene, SceneEntityRef, Direction, NpcTemplate, ItemTemplate, EnvironmentType } from '../types/map';
 import { DIRECTION_LABELS } from '../utils/mapConverter';
 
 interface SceneEditorProps {
@@ -110,7 +110,7 @@ export function SceneEditor({
           <label>环境类型</label>
           <select
             value={local.environment}
-            onChange={(e) => update({ environment: e.target.value })}
+            onChange={(e) => update({ environment: e.target.value as EnvironmentType })}
           >
             <option value="mountain">山地 (mountain)</option>
             <option value="forest">森林 (forest)</option>
