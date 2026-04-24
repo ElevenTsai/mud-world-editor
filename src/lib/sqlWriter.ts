@@ -53,16 +53,25 @@ function sqlNum(value: number | undefined | null): string {
   return String(value);
 }
 
+/** Format a weight value always with 2 decimal places (e.g. 0.50, 1.00) */
+function sqlWeight(value: number | undefined | null): string {
+  if (value == null) return 'NULL';
+  return value.toFixed(2);
+}
+
 function sqlArray(arr: string[] | undefined | null): string {
   if (!arr || arr.length === 0) return "ARRAY[]::text[]";
   const items = arr.map(s => "'" + s.replace(/'/g, "''") + "'").join(',');
   return `ARRAY[${items}]::text[]`;
 }
 
+/** Format a value as a JSON string literal for SQL (with spaces after : and ,) */
 function sqlJson(value: unknown): string {
   if (value == null) return 'NULL';
-  const json = JSON.stringify(value);
-  return "'" + json.replace(/'/g, "''") + "'::jsonb";
+  const json = JSON.stringify(value)
+    .replace(/,/g, ', ')
+    .replace(/:/g, ': ');
+  return "'" + json.replace(/'/g, "''") + "'";
 }
 
 // ---- Table writers ----
@@ -74,26 +83,27 @@ function writeNpcInserts(npcs: NpcTemplate[]): string {
     const dropStr = n.drop && n.drop.length > 0 ? sqlStr(n.drop[0]) : sqlStr('{}');
     return `  (${sqlStr(n.id)}, ${sqlStr(n.name)}, ${sqlStr(n.description)}, ${sqlArray(n.tags)}, ${sqlBool(n.visible)}, ${sqlNum(n.level)}, ${sqlStr(n.realm)}, ${sqlNum(n.hp)}, ${sqlNum(n.max_hp)}, ${sqlNum(n.mp)}, ${sqlNum(n.max_mp)}, ${sqlNum(n.attack)}, ${sqlNum(n.defense)}, ${sqlNum(n.speed)}, ${sqlStr(n.ai)}, ${sqlStr(n.dialogue)}, ${dropStr})`;
   });
-  return header + '\n' + rows.join(',\n') + ';\n';
+  return header + '\n' + rows.join(',\n') + ';';
 }
 
 function writeItemInserts(items: ItemTemplate[]): string {
   if (items.length === 0) return '';
   const header = 'INSERT INTO item_templates (id, name, description, tags, icon, visible, rarity, stackable, max_stack, value, weight, usable, effect, equip_slot, bonuses) VALUES';
   const rows = items.map(item => {
-    return `  (${sqlStr(item.id)}, ${sqlStr(item.name)}, ${sqlStr(item.description)}, ${sqlArray(item.tags)}, ${sqlStr(item.icon)}, ${sqlBool(item.visible)}, ${sqlStr(item.rarity)}, ${sqlBool(item.stackable)}, ${sqlNum(item.max_stack)}, ${sqlNum(item.value)}, ${sqlNum(item.weight)}, ${sqlBool(item.usable)}, ${sqlJson(item.effect)}, ${sqlStr(item.equip_slot as string | undefined)}, ${sqlJson(item.bonuses)})`;
+    return `  (${sqlStr(item.id)}, ${sqlStr(item.name)}, ${sqlStr(item.description)}, ${sqlArray(item.tags)}, ${sqlStr(item.icon)}, ${sqlBool(item.visible)}, ${sqlStr(item.rarity)}, ${sqlBool(item.stackable)}, ${sqlNum(item.max_stack)}, ${sqlNum(item.value)}, ${sqlWeight(item.weight)}, ${sqlBool(item.usable)}, ${sqlJson(item.effect)}, ${sqlStr(item.equip_slot as string | undefined)}, ${sqlJson(item.bonuses)})`;
   });
-  return header + '\n' + rows.join(',\n') + ';\n';
+  return header + '\n' + rows.join(',\n') + ';';
 }
 
 function writeSceneInserts(scenes: Scene[]): string {
   if (scenes.length === 0) return '';
   const header = 'INSERT INTO scenes (id, name, description, safe_zone, environment, level_min, level_max, exits) VALUES';
   const rows = scenes.map(s => {
-    const exitsJson = sqlStr(JSON.stringify(s.exits));
+    const exitsStr = JSON.stringify(s.exits).replace(/,/g, ', ').replace(/:/g, ': ');
+    const exitsJson = sqlStr(exitsStr);
     return `  (${sqlStr(s.id)}, ${sqlStr(s.name)}, ${sqlStr(s.description)}, ${sqlBool(s.safe_zone)}, ${sqlStr(s.environment)}, ${sqlNum(s.level_range?.[0])}, ${sqlNum(s.level_range?.[1])}, ${exitsJson})`;
   });
-  return header + '\n' + rows.join(',\n') + ';\n';
+  return header + '\n' + rows.join(',\n') + ';';
 }
 
 function writeSceneEntityInserts(scenes: Scene[]): string {
@@ -109,7 +119,7 @@ function writeSceneEntityInserts(scenes: Scene[]): string {
   const rows = allEntities.map(({ sceneId, entity }) => {
     return `  (${sqlStr(sceneId)}, ${sqlStr(entity.template_id)}, ${sqlStr(entity.type)}, ${sqlNum(entity.quantity)}, ${sqlArray(entity.tags)}, ${sqlBool(entity.visible)})`;
   });
-  return header + '\n' + rows.join(',\n') + ';\n';
+  return header + '\n' + rows.join(',\n') + ';';
 }
 
 // ---- Public API ----
