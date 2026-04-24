@@ -242,6 +242,7 @@ function App() {
         y: Math.round((Math.random() * 300 + 80) / 20) * 20,
       },
       ...(groupNode ? { parentId: `area-${areaPrefix}`, extent: 'parent' as const } : {}),
+      draggable: false,
       width: 180,
       height: 100,
       data: {
@@ -274,6 +275,7 @@ function App() {
       id: `area-${info.prefix}`,
       type: 'areaGroup',
       position: { x: maxRight + 200, y: 0 },
+      draggable: false,
       data: { label: info.label },
       style: {
         width: 300,

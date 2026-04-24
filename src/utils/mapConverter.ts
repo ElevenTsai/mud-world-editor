@@ -189,6 +189,7 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
       id: `area-${prefix}`,
       type: 'areaGroup',
       position: { x: groupX, y: groupY },
+      draggable: false,
       data: { label: getAreaLabel(prefix) },
       style: {
         width: groupW,
@@ -209,6 +210,7 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
         position: { x: pos.x - groupX, y: pos.y - groupY },
         parentId: `area-${prefix}`,
         extent: 'parent' as const,
+        draggable: false,
         data: { scene: structuredClone(scenes[id]) },
         width: NODE_W,
         height: NODE_H,
