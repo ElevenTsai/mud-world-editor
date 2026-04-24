@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 496" width="760" height="496" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <style>
+        .area-title { font-size: 15px; font-weight: 700; }
+        .scene-name { font-size: 11px; fill: #444; }
+        .scene-name-cross { font-size: 11px; font-weight: 600; }
+        .link-line { stroke-width: 2; fill: none; }
+    </style>
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12" />
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <rect x="80" y="80" width="180" height="336" rx="12" fill="#e8f4f8" stroke="#4a90a4" stroke-width="2.5" />
+    <text x="170" y="104" text-anchor="middle" class="area-title" fill="#4a90a4">江州鱼埠</text>
+  </g>
+  <text x="96" y="128" class="scene-name" fill="#444">· 渔户营</text>
+  <text x="96" y="146" class="scene-name-cross" fill="#4a90a4">● 渔户营东侧码头</text>
+  <text x="96" y="164" class="scene-name" fill="#444">· 江州鱼市</text>
+  <text x="96" y="182" class="scene-name" fill="#444">· 清鳞分拣厂</text>
+  <text x="96" y="200" class="scene-name" fill="#444">· 蓄鱼仓</text>
+  <text x="96" y="218" class="scene-name" fill="#444">· 捕鱼房</text>
+  <text x="96" y="236" class="scene-name" fill="#444">· 江州官仓</text>
+  <text x="96" y="254" class="scene-name" fill="#444">· 修辑坊</text>
+  <text x="96" y="272" class="scene-name" fill="#444">· 活鱼递运廊</text>
+  <text x="96" y="290" class="scene-name" fill="#444">· 栖浪酒家·一层</text>
+  <text x="96" y="308" class="scene-name" fill="#444">· 栖浪酒家·二层</text>
+  <text x="96" y="326" class="scene-name" fill="#444">· 栖浪酒家·三层</text>
+  <text x="96" y="344" class="scene-name" fill="#444">· 海港商会</text>
+  <text x="96" y="362" class="scene-name" fill="#444">· 玄章镇潮阁·一层</text>
+  <text x="96" y="380" class="scene-name" fill="#444">· 玄章镇潮阁·二层</text>
+  <text x="96" y="398" class="scene-name" fill="#444">· 玄章镇潮阁·三层</text>
+  <g filter="url(#shadow)">
+    <rect x="500" y="80" width="180" height="192" rx="12" fill="#f5eef8" stroke="#8e6aad" stroke-width="2.5" />
+    <text x="590" y="104" text-anchor="middle" class="area-title" fill="#8e6aad">云栖城</text>
+  </g>
+  <text x="516" y="128" class="scene-name-cross" fill="#8e6aad">● 朝元门</text>
+  <text x="516" y="146" class="scene-name" fill="#444">· 烟舟坊</text>
+  <text x="516" y="164" class="scene-name" fill="#444">· 引航台</text>
+  <text x="516" y="182" class="scene-name" fill="#444">· 望霄楼</text>
+  <text x="516" y="200" class="scene-name" fill="#444">· 青蔬坊</text>
+  <text x="516" y="218" class="scene-name" fill="#444">· 云舟修葺台</text>
+  <text x="516" y="236" class="scene-name" fill="#444">· 市集</text>
+  <text x="516" y="254" class="scene-name" fill="#444">· 通玄门</text>
+  <path d="M 260 142 L 380 142 L 380 124 L 500 124" class="link-line" stroke="#4a90a4" stroke-opacity="0.6" stroke-dasharray="6,3" />
+  <circle cx="260" cy="142" r="3" fill="#4a90a4" />
+  <circle cx="500" cy="124" r="3" fill="#4a90a4" />
+  <g opacity="0.5">
+    <circle cx="715" cy="50" r="26" fill="white" stroke="#999" stroke-width="1" />
+    <text x="715" y="36" text-anchor="middle" font-size="11" font-weight="600" fill="#555">北</text>
+    <text x="715" y="70" text-anchor="middle" font-size="11" font-weight="600" fill="#555">南</text>
+    <text x="733" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#555">东</text>
+    <text x="697" y="54" text-anchor="middle" font-size="11" font-weight="600" fill="#555">西</text>
+    <path d="M 715 47 L 711 53 L 719 53 Z" fill="#e74c3c" />
+  </g>
+</svg>

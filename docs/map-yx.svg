@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 770 476" width="770" height="476" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <style>
+        .node-label { font-size: 13px; font-weight: 600; }
+        .node-sub { font-size: 10px; fill: #666; }
+        .edge-path { stroke-width: 2; fill: none; }
+        .area-label { font-size: 18px; font-weight: 700; fill-opacity: 0.4; }
+        .legend-text { font-size: 11px; fill: #555; }
+    </style>
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-opacity="0.12" />
+    </filter>
+  </defs>
+  <rect x="50" y="24" width="640" height="402" rx="16" fill="#f5eef8" stroke="#8e6aad" stroke-width="2" stroke-dasharray="8,4" fill-opacity="0.5" />
+  <text x="66" y="46" class="area-label" fill="#8e6aad">云栖城</text>
+  <path d="M 240.0 238.0 L 256.0 238.0 L 270.0 238.0 L 270.0 238.0 L 284.0 238.0 L 300.0 238.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 170.0 210.0 L 170.0 194.0 L 170.0 183.0 L 170.0 183.0 L 170.0 172.0 L 170.0 156.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 170.0 266.0 L 170.0 282.0 L 170.0 293.0 L 170.0 293.0 L 170.0 304.0 L 170.0 320.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 440.0 238.0 L 456.0 238.0 L 470.0 238.0 L 470.0 238.0 L 484.0 238.0 L 500.0 238.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 370.0 210.0 L 370.0 194.0 L 370.0 183.0 L 370.0 183.0 L 370.0 172.0 L 370.0 156.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 370.0 266.0 L 370.0 282.0 L 370.0 293.0 L 370.0 293.0 L 370.0 304.0 L 370.0 320.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 240.0 128.0 L 256.0 128.0 L 270.0 128.0 L 270.0 128.0 L 284.0 128.0 L 300.0 128.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 570.0 266.0 L 570.0 282.0 L 570.0 293.0 L 570.0 293.0 L 570.0 304.0 L 570.0 320.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 240.0 348.0 L 256.0 348.0 L 270.0 348.0 L 270.0 348.0 L 284.0 348.0 L 300.0 348.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <path d="M 440.0 348.0 L 456.0 348.0 L 470.0 348.0 L 470.0 348.0 L 484.0 348.0 L 500.0 348.0" class="edge-path" stroke="#8e6aad" stroke-opacity="0.4" stroke-dasharray="none" stroke-width="2" />
+  <g filter="url(#shadow)">
+    <rect x="100.0" y="210.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="170.0" y="230.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 朝元门</text>
+    <text x="170.0" y="248.0" text-anchor="middle" class="node-sub">Lv.5-15  👤×2</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="300.0" y="210.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="370.0" y="230.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 烟舟坊</text>
+    <text x="370.0" y="248.0" text-anchor="middle" class="node-sub">Lv.5-15  👤×3  📦×5</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="100.0" y="100.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="170.0" y="120.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 引航台</text>
+    <text x="170.0" y="138.0" text-anchor="middle" class="node-sub">Lv.5-15  👤×2  📦×1</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="300.0" y="100.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="370.0" y="120.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 望霄楼</text>
+    <text x="370.0" y="138.0" text-anchor="middle" class="node-sub">Lv.5-15  👤×3  📦×1</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="500.0" y="210.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="570.0" y="230.0" text-anchor="middle" class="node-label" fill="#8e6aad">⛰️ 青蔬坊</text>
+    <text x="570.0" y="248.0" text-anchor="middle" class="node-sub">Lv.5-12  👤×2  📦×5  ⚔️</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="100.0" y="320.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="170.0" y="340.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 云舟修葺台</text>
+    <text x="170.0" y="358.0" text-anchor="middle" class="node-sub">Lv.8-18  👤×3  📦×3  ⚔️</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="300.0" y="320.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#8e6aad" stroke-width="2" />
+    <text x="370.0" y="340.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 市集</text>
+    <text x="370.0" y="358.0" text-anchor="middle" class="node-sub">Lv.5-15  👤×3  📦×1</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="500.0" y="320.0" width="140" height="56" rx="10" fill="#ead8f5" stroke="#e74c3c" stroke-width="2.5" />
+    <text x="570.0" y="340.0" text-anchor="middle" class="node-label" fill="#8e6aad">☁️ 通玄门</text>
+    <text x="570.0" y="358.0" text-anchor="middle" class="node-sub">Lv.10-25  👤×2  ⚔️</text>
+    <text x="632.0" y="334.0" text-anchor="end" font-size="10">⚠️</text>
+  </g>
+  <g opacity="0.5">
+    <circle cx="715.0" cy="60" r="28" fill="white" stroke="#999" stroke-width="1" />
+    <text x="715.0" y="44" text-anchor="middle" font-size="11" font-weight="600" fill="#555">北</text>
+    <text x="715.0" y="82" text-anchor="middle" font-size="11" font-weight="600" fill="#555">南</text>
+    <text x="735.0" y="64" text-anchor="middle" font-size="11" font-weight="600" fill="#555">东</text>
+    <text x="695.0" y="64" text-anchor="middle" font-size="11" font-weight="600" fill="#555">西</text>
+    <path d="M 715.0 56 L 711.0 64 L 719.0 64 Z" fill="#e74c3c" />
+  </g>
+  <g>
+    <rect x="16" y="408" width="240" height="58" rx="8" fill="white" stroke="#ccc" fill-opacity="0.9" />
+    <text x="26" y="426" class="legend-text">实线 = 同区域  虚线 = 跨区域</text>
+    <text x="26" y="442" class="legend-text">⚠️ 红框 = 危险区域（非安全区）</text>
+    <text x="26" y="458" class="legend-text">⚔️ = 怪物  👤 = NPC  📦 = 物品</text>
+  </g>
+</svg>
