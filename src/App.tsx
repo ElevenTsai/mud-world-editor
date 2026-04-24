@@ -12,7 +12,6 @@ import {
   type Node,
   type Edge,
   type Connection,
-  type NodeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -50,19 +49,19 @@ function App() {
   const [selectedAreaPrefix, setSelectedAreaPrefix] = useState<string | null>(null);
   const idCounter = useRef(1);
 
-  // Wrap onNodesChange: only allow dragging selected nodes
-  const onNodesChange = useCallback((changes: NodeChange[]) => {
-    // Block position changes (drag) for unselected nodes
-    const filtered = changes.filter((c) => {
-      if (c.type === 'position' && 'dragging' in c && c.dragging) {
-        // Allow drag only if the node is currently selected
-        const node = nodes.find((n) => n.id === c.id);
-        return node?.selected === true;
-      }
-      return true;
-    });
-    onNodesChangeBase(filtered);
-  }, [onNodesChangeBase, nodes]);
+  // Set draggable only on the previously-selected node (not on first click)
+  const selectedDraggableId = selectedNodeId ?? (selectedAreaPrefix ? `area-${selectedAreaPrefix}` : null);
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        draggable: n.id === selectedDraggableId,
+      })),
+    );
+  }, [selectedDraggableId, setNodes]);
+
+  // Pass through all node changes without filtering
+  const onNodesChange = onNodesChangeBase;
 
   // Load world data from SQL files on startup
   useEffect(() => {
