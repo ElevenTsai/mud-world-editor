@@ -12,7 +12,7 @@ import type {
 
 // ---- Area prefix → filename mapping (from shared config) ----
 
-import { getAreaInfo, getAreaPrefix as _getAreaPrefix } from '../utils/areaConfig';
+import { getAreaInfo, getAreaPrefix as _getAreaPrefix, AREA_CONFIG } from '../utils/areaConfig';
 
 function getAreaPrefix(id: string): string {
   return _getAreaPrefix(id);
@@ -25,6 +25,15 @@ function getFileName(prefix: string): string {
 function getAreaLabel(prefix: string): string {
   const info = getAreaInfo(prefix);
   return `${info.label} (${prefix}_)`;
+}
+
+/** Reverse mapping: filename → prefix */
+function getFileNameToPrefix(): Record<string, string> {
+  const map: Record<string, string> = {};
+  for (const [prefix, info] of Object.entries(AREA_CONFIG)) {
+    map[info.fileName] = prefix;
+  }
+  return map;
 }
 
 // ---- SQL value formatting ----
@@ -108,91 +117,79 @@ function writeSceneEntityInserts(scenes: Scene[]): string {
 /**
  * Group WorldData by area prefix and generate SQL file contents.
  * Also accepts preserved sections (quests, comments) per file to re-include.
+ * originalFileMap maps entity IDs to their original source filename.
  */
 export function worldDataToSqlFiles(
   data: WorldData,
   preservedSections?: Record<string, string>,
+  originalFileMap?: Record<string, string>,
 ): Record<string, string> {
   // Group scenes by area prefix
-  const scenesByArea = new Map<string, Scene[]>();
+  const scenesByFile = new Map<string, Scene[]>();
   for (const scene of Object.values(data.scenes)) {
     const prefix = getAreaPrefix(scene.id);
-    const list = scenesByArea.get(prefix) ?? [];
+    const fileName = getFileName(prefix);
+    const list = scenesByFile.get(fileName) ?? [];
     list.push(scene);
-    scenesByArea.set(prefix, list);
+    scenesByFile.set(fileName, list);
   }
 
-  // Collect all area prefixes (from scenes, npcs, items)
-  const allPrefixes = new Set<string>();
-  for (const scene of Object.values(data.scenes)) allPrefixes.add(getAreaPrefix(scene.id));
+  // Collect all filenames
+  const allFileNames = new Set<string>();
+  for (const fileName of scenesByFile.keys()) allFileNames.add(fileName);
 
-  // Group NPCs by the area they belong to (based on scene entities)
-  const npcAreaMap = new Map<string, Set<string>>();
-  for (const scene of Object.values(data.scenes)) {
-    const prefix = getAreaPrefix(scene.id);
-    for (const entity of scene.entities) {
-      if (entity.type === 'npc') {
-        if (!npcAreaMap.has(entity.template_id)) npcAreaMap.set(entity.template_id, new Set());
-        npcAreaMap.get(entity.template_id)!.add(prefix);
-      }
-    }
-  }
-
-  // Group Items by the area they belong to (based on scene entities)
-  const itemAreaMap = new Map<string, Set<string>>();
-  for (const scene of Object.values(data.scenes)) {
-    const prefix = getAreaPrefix(scene.id);
-    for (const entity of scene.entities) {
-      if (entity.type === 'item') {
-        if (!itemAreaMap.has(entity.template_id)) itemAreaMap.set(entity.template_id, new Set());
-        itemAreaMap.get(entity.template_id)!.add(prefix);
-      }
-    }
-  }
-
-  // For NPCs/items not referenced by any scene entity, use their own ID prefix
+  // Group NPCs by file: use original file mapping if available, else fall back to scene-entity references
+  const npcsByFile = new Map<string, NpcTemplate[]>();
   for (const npc of Object.values(data.npcs)) {
-    if (!npcAreaMap.has(npc.id)) {
-      npcAreaMap.set(npc.id, new Set([getAreaPrefix(npc.id)]));
+    let fileName = originalFileMap?.[npc.id];
+    if (!fileName) {
+      // Fallback: find which scene area references this NPC
+      let targetPrefix: string | undefined;
+      for (const scene of Object.values(data.scenes)) {
+        if (scene.entities.some(e => e.type === 'npc' && e.template_id === npc.id)) {
+          targetPrefix = getAreaPrefix(scene.id);
+          break;
+        }
+      }
+      fileName = getFileName(targetPrefix ?? getAreaPrefix(npc.id));
     }
-  }
-  for (const item of Object.values(data.items)) {
-    if (!itemAreaMap.has(item.id)) {
-      itemAreaMap.set(item.id, new Set([getAreaPrefix(item.id)]));
-    }
-  }
-
-  // Assign each NPC to its primary area (first one alphabetically)
-  const npcsByArea = new Map<string, NpcTemplate[]>();
-  for (const [npcId, areas] of npcAreaMap) {
-    const npc = data.npcs[npcId];
-    if (!npc) continue;
-    const primaryArea = [...areas].sort()[0];
-    const list = npcsByArea.get(primaryArea) ?? [];
+    const list = npcsByFile.get(fileName) ?? [];
     list.push(npc);
-    npcsByArea.set(primaryArea, list);
-    allPrefixes.add(primaryArea);
+    npcsByFile.set(fileName, list);
+    allFileNames.add(fileName);
   }
 
-  const itemsByArea = new Map<string, ItemTemplate[]>();
-  for (const [itemId, areas] of itemAreaMap) {
-    const item = data.items[itemId];
-    if (!item) continue;
-    const primaryArea = [...areas].sort()[0];
-    const list = itemsByArea.get(primaryArea) ?? [];
+  // Group items by file: same logic
+  const itemsByFile = new Map<string, ItemTemplate[]>();
+  for (const item of Object.values(data.items)) {
+    let fileName = originalFileMap?.[item.id];
+    if (!fileName) {
+      let targetPrefix: string | undefined;
+      for (const scene of Object.values(data.scenes)) {
+        if (scene.entities.some(e => e.type === 'item' && e.template_id === item.id)) {
+          targetPrefix = getAreaPrefix(scene.id);
+          break;
+        }
+      }
+      fileName = getFileName(targetPrefix ?? getAreaPrefix(item.id));
+    }
+    const list = itemsByFile.get(fileName) ?? [];
     list.push(item);
-    itemsByArea.set(primaryArea, list);
-    allPrefixes.add(primaryArea);
+    itemsByFile.set(fileName, list);
+    allFileNames.add(fileName);
   }
 
-  // Generate SQL for each area
+  // Generate SQL for each file
   const files: Record<string, string> = {};
 
-  for (const prefix of [...allPrefixes].sort()) {
-    const fileName = getFileName(prefix);
-    const scenes = scenesByArea.get(prefix) ?? [];
-    const npcs = npcsByArea.get(prefix) ?? [];
-    const items = itemsByArea.get(prefix) ?? [];
+  for (const fileName of [...allFileNames].sort()) {
+    // Derive prefix from fileName for the header label
+    const fileToPrefix = getFileNameToPrefix();
+    const prefix = fileToPrefix[fileName]
+      ?? fileName.replace(/^seed_/, '').replace(/\.sql$/, '');
+    const scenes = scenesByFile.get(fileName) ?? [];
+    const npcs = npcsByFile.get(fileName) ?? [];
+    const items = itemsByFile.get(fileName) ?? [];
 
     const sections: string[] = [];
     sections.push(`-- Seed data: ${getAreaLabel(prefix)}`);

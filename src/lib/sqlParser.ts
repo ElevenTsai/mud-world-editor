@@ -397,3 +397,22 @@ export function extractPreservedSections(sql: string): string {
 
   return preserved.join('\n').trim();
 }
+
+/**
+ * Extract all NPC and item IDs from a SQL file (for tracking file membership).
+ */
+export function extractEntityIds(sql: string): string[] {
+  const ids: string[] = [];
+
+  for (const table of ['npc_templates', 'item_templates'] as const) {
+    const { columns, rows } = extractInserts(sql, table);
+    if (rows.length === 0) continue;
+    const idIdx = columns.indexOf('id');
+    if (idIdx < 0) continue;
+    for (const row of rows) {
+      ids.push(parseSqlString(row[idIdx]));
+    }
+  }
+
+  return ids;
+}
