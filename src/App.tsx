@@ -12,6 +12,7 @@ import {
   type Node,
   type Edge,
   type Connection,
+  type NodeChange,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -38,7 +39,7 @@ type ActivePanel = 'scene' | 'area' | 'npcs' | 'items' | null;
 const nodeTypes = { sceneNode: SceneNode, areaGroup: AreaGroup };
 
 function App() {
-  const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
+  const [nodes, setNodes, onNodesChangeBase] = useNodesState([] as Node[]);
   const [edges, setEdges, onEdgesChangeBase] = useEdgesState([] as Edge[]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [editorKey, setEditorKey] = useState(0);
@@ -48,6 +49,20 @@ function App() {
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [selectedAreaPrefix, setSelectedAreaPrefix] = useState<string | null>(null);
   const idCounter = useRef(1);
+
+  // Wrap onNodesChange: only allow dragging selected nodes
+  const onNodesChange = useCallback((changes: NodeChange[]) => {
+    // Block position changes (drag) for unselected nodes
+    const filtered = changes.filter((c) => {
+      if (c.type === 'position' && 'dragging' in c && c.dragging) {
+        // Allow drag only if the node is currently selected
+        const node = nodes.find((n) => n.id === c.id);
+        return node?.selected === true;
+      }
+      return true;
+    });
+    onNodesChangeBase(filtered);
+  }, [onNodesChangeBase, nodes]);
 
   // Load world data from SQL files on startup
   useEffect(() => {
