@@ -11,11 +11,17 @@ function SceneNodeComponent({ data, selected }: NodeProps) {
   return (
     <div className={`scene-node ${selected ? 'selected' : ''}`}>
       {/* North */}
-      <Handle type="source" position={Position.Top} id="north-source" style={{ left: '50%' }} />
-      <Handle type="target" position={Position.Top} id="north-target" style={{ left: '50%' }} />
+      <Handle type="source" position={Position.Top} id="north-source" style={{ left: '40%' }} />
+      <Handle type="target" position={Position.Top} id="north-target" style={{ left: '40%' }} />
+      {/* Up */}
+      <Handle type="source" position={Position.Top} id="up-source" style={{ left: '60%' }} />
+      <Handle type="target" position={Position.Top} id="up-target" style={{ left: '60%' }} />
       {/* South */}
-      <Handle type="source" position={Position.Bottom} id="south-source" style={{ left: '50%' }} />
-      <Handle type="target" position={Position.Bottom} id="south-target" style={{ left: '50%' }} />
+      <Handle type="source" position={Position.Bottom} id="south-source" style={{ left: '40%' }} />
+      <Handle type="target" position={Position.Bottom} id="south-target" style={{ left: '40%' }} />
+      {/* Down */}
+      <Handle type="source" position={Position.Bottom} id="down-source" style={{ left: '60%' }} />
+      <Handle type="target" position={Position.Bottom} id="down-target" style={{ left: '60%' }} />
       {/* West */}
       <Handle type="source" position={Position.Left} id="west-source" style={{ top: '50%' }} />
       <Handle type="target" position={Position.Left} id="west-target" style={{ top: '50%' }} />

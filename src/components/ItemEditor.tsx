@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { ItemTemplate, ItemRarity, EquipSlot } from '../types/map';
-import { upsertItem, deleteItem } from '../lib/db';
 
 interface ItemEditorProps {
   items: Record<string, ItemTemplate>;
@@ -42,11 +41,8 @@ export function ItemEditor({ items, onUpdateItems, onClose }: ItemEditorProps) {
     }
     setSaving(true);
     try {
-      await upsertItem(editingItem);
       onUpdateItems({ ...items, [editingItem.id]: editingItem });
       setIsNew(false);
-    } catch (err) {
-      alert(`保存失败: ${(err as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -57,13 +53,10 @@ export function ItemEditor({ items, onUpdateItems, onClose }: ItemEditorProps) {
     if (!confirm(`确定删除物品「${editingItem.name}」？`)) return;
     setSaving(true);
     try {
-      await deleteItem(editingItem.id);
       const updated = { ...items };
       delete updated[editingItem.id];
       onUpdateItems(updated);
       setEditingItem(null);
-    } catch (err) {
-      alert(`删除失败: ${(err as Error).message}`);
     } finally {
       setSaving(false);
     }

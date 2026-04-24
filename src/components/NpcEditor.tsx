@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { NpcTemplate, AiBehavior } from '../types/map';
-import { upsertNpc, deleteNpc } from '../lib/db';
 
 interface NpcEditorProps {
   npcs: Record<string, NpcTemplate>;
@@ -41,11 +40,8 @@ export function NpcEditor({ npcs, onUpdateNpcs, onClose }: NpcEditorProps) {
     }
     setSaving(true);
     try {
-      await upsertNpc(editingNpc);
       onUpdateNpcs({ ...npcs, [editingNpc.id]: editingNpc });
       setIsNew(false);
-    } catch (err) {
-      alert(`保存失败: ${(err as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -56,13 +52,10 @@ export function NpcEditor({ npcs, onUpdateNpcs, onClose }: NpcEditorProps) {
     if (!confirm(`确定删除 NPC「${editingNpc.name}」？`)) return;
     setSaving(true);
     try {
-      await deleteNpc(editingNpc.id);
       const updated = { ...npcs };
       delete updated[editingNpc.id];
       onUpdateNpcs(updated);
       setEditingNpc(null);
-    } catch (err) {
-      alert(`删除失败: ${(err as Error).message}`);
     } finally {
       setSaving(false);
     }

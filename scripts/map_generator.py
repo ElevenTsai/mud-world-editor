@@ -372,13 +372,33 @@ def compute_layout(
                         grid_pos[sid] = old
                         occ_set.add(old)
 
-        # Convert to pixel coordinates and expand buildings
+        # Convert to pixel coordinates with variable row heights for buildings
         if grid_pos:
             min_c = min(c for c, r in grid_pos.values())
             min_r = min(r for c, r in grid_pos.values())
+            max_r = max(r for c, r in grid_pos.values())
+
+            # Compute height of each row (buildings may be taller than NODE_H)
+            row_height: dict[int, float] = {}
+            for r in range(min_r, max_r + 1):
+                max_h = NODE_H
+                for sid, (gc, gr) in grid_pos.items():
+                    if gr == r and sid in buildings:
+                        bh = FLOOR_STRIP_H * len(buildings[sid]) + 6
+                        max_h = max(max_h, bh)
+                row_height[r] = max_h
+
+            ROW_GAP = CELL_H - NODE_H  # gap between rows
+            # Cumulative y offset for each row
+            row_y: dict[int, float] = {}
+            cum_y = 0.0
+            for r in range(min_r, max_r + 1):
+                row_y[r] = cum_y
+                cum_y += row_height[r] + ROW_GAP
+
             for sid, (c, r) in grid_pos.items():
                 px = (c - min_c) * CELL_W + area_offset_x
-                py = (r - min_r) * CELL_H
+                py = row_y[r]
                 all_pos[sid] = (px, py)
                 # Expand building floors: all get same position as anchor
                 if sid in buildings:
@@ -431,9 +451,8 @@ def _render_building(
     n = len(floors)
     box_h = FLOOR_STRIP_H * n + 6
 
-    # Building grows upward: anchor (ground floor) bottom edge aligns with
-    # the standard NODE_H bottom, upper floors extend above
-    box_y = y + NODE_H - box_h  # shift up so bottom aligns with regular node bottom
+    # Building grows downward: top floor starts at cell y, lower floors extend below
+    box_y = y
 
     g = ET.SubElement(svg, "g", {"filter": "url(#shadow)"})
 
@@ -597,16 +616,10 @@ def generate_svg(
             return FLOOR_STRIP_H * len(buildings[sid]) + 8
         return NODE_H
 
-    # Normalize positions — account for buildings that extend upward
+    # Normalize positions — buildings now grow downward, no special upward offset needed
     if pos:
         min_x = min(p[0] for p in pos.values())
         min_y = min(p[1] for p in pos.values())
-        # Buildings grow upward: top = y + NODE_H - box_h
-        for sid in buildings:
-            if sid in pos:
-                bh = FLOOR_STRIP_H * len(buildings[sid]) + 6
-                building_top = pos[sid][1] + NODE_H - bh
-                min_y = min(min_y, building_top)
         pos = {sid: (p[0] - min_x + PADDING, p[1] - min_y + PADDING) for sid, p in pos.items()}
 
     canvas_w = max(p[0] for p in pos.values()) + NODE_W + PADDING + 30 if pos else 800
@@ -645,7 +658,7 @@ def generate_svg(
         xs = [pos[sid][0] for sid in scene_ids if sid in pos]
         if not xs:
             continue
-        # Compute actual top/bottom accounting for building upward extension
+        # Compute actual top/bottom accounting for building downward extension
         tops: list[float] = []
         bottoms: list[float] = []
         for sid in scene_ids:
@@ -654,8 +667,8 @@ def generate_svg(
             sy = pos[sid][1]
             if sid in buildings:
                 bh = FLOOR_STRIP_H * len(buildings[sid]) + 6
-                tops.append(sy + NODE_H - bh)
-                bottoms.append(sy + NODE_H)
+                tops.append(sy)
+                bottoms.append(sy + bh)
             else:
                 tops.append(sy)
                 bottoms.append(sy + NODE_H)
@@ -726,7 +739,7 @@ def generate_svg(
                 floors = buildings[anchor_id]
                 n = len(floors)
                 bh = FLOOR_STRIP_H * n + 6
-                box_top = py + NODE_H - bh
+                box_top = py  # building grows downward from cell y
                 # For N/S on the whole box, use full box port
                 if d in ("north", "up"):
                     return px + NODE_W / 2, box_top
@@ -1039,7 +1052,7 @@ def generate_overview_svg(
 def main():
     parser = argparse.ArgumentParser(description="Generate SVG world map from seed SQL files")
     parser.add_argument("--input", "-i",
-        default=str(Path(__file__).resolve().parent.parent / "data"),
+        default=str(Path(__file__).resolve().parent.parent / "supabase"),
         help="Path to a .sql file or a directory containing .sql files")
     parser.add_argument("--output-dir", "-o",
         default=str(Path(__file__).resolve().parent.parent / "docs"),

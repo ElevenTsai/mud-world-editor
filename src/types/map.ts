@@ -1,6 +1,6 @@
 export type EnvironmentType =
   | 'mountain' | 'forest' | 'city' | 'cave' | 'desert'
-  | 'swamp' | 'river' | 'plain' | 'ruins' | 'dungeon';
+  | 'swamp' | 'river' | 'plain' | 'ruins' | 'dungeon' | 'sky';
 
 export type AiBehavior = 'passive' | 'aggressive';
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -68,6 +68,8 @@ export interface Scene {
     south?: string;
     east?: string;
     west?: string;
+    up?: string;
+    down?: string;
   };
   entities: SceneEntityRef[];
 }
@@ -78,4 +80,4 @@ export interface WorldData {
   items: Record<string, ItemTemplate>;
 }
 
-export type Direction = 'north' | 'south' | 'east' | 'west';
+export type Direction = 'north' | 'south' | 'east' | 'west' | 'up' | 'down';

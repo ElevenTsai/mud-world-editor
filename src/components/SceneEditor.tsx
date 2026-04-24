@@ -122,6 +122,7 @@ export function SceneEditor({
             <option value="plain">平原 (plain)</option>
             <option value="ruins">遗迹 (ruins)</option>
             <option value="dungeon">地牢 (dungeon)</option>
+            <option value="sky">天空 (sky)</option>
           </select>
         </div>
 

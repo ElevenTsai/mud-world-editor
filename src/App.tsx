@@ -16,9 +16,11 @@ import {
 import '@xyflow/react/dist/style.css';
 
 import { SceneNode } from './components/SceneNode';
+import { AreaGroup } from './components/AreaGroup';
 import { SceneEditor } from './components/SceneEditor';
 import { NpcEditor } from './components/NpcEditor';
 import { ItemEditor } from './components/ItemEditor';
+import { AreaEditor } from './components/AreaEditor';
 import { Toolbar } from './components/Toolbar';
 import {
   scenesToFlow,
@@ -27,12 +29,13 @@ import {
 } from './utils/mapConverter';
 import { DEFAULT_WORLD } from './utils/defaultScenes';
 import { loadWorld } from './lib/db';
+import { registerArea, type AreaInfo } from './utils/areaConfig';
 import type { Scene, Direction, NpcTemplate, ItemTemplate, WorldData } from './types/map';
 import './App.css';
 
-type ActivePanel = 'scene' | 'npcs' | 'items' | null;
+type ActivePanel = 'scene' | 'area' | 'npcs' | 'items' | null;
 
-const nodeTypes = { sceneNode: SceneNode };
+const nodeTypes = { sceneNode: SceneNode, areaGroup: AreaGroup };
 
 function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
@@ -43,9 +46,10 @@ function App() {
   const [items, setItems] = useState<Record<string, ItemTemplate>>({});
   const [loading, setLoading] = useState(true);
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+  const [selectedAreaPrefix, setSelectedAreaPrefix] = useState<string | null>(null);
   const idCounter = useRef(1);
 
-  // Load world data from Supabase on startup
+  // Load world data from SQL files on startup
   useEffect(() => {
     loadWorld()
       .then((data: WorldData) => {
@@ -55,7 +59,8 @@ function App() {
         setNpcs(data.npcs);
         setItems(data.items);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Failed to load world from SQL files:', err);
         // Fallback to built-in default data
         const flow = scenesToFlow(DEFAULT_WORLD.scenes);
         setNodes(flow.nodes);
@@ -82,7 +87,7 @@ function App() {
             for (const e of currentEdges) {
               if (e.source !== n.id) continue;
               const d = e.sourceHandle?.replace('-source', '') as Direction | undefined;
-              if (d && (['north', 'south', 'east', 'west'] as Direction[]).includes(d)) {
+              if (d && (['north', 'south', 'east', 'west', 'up', 'down'] as Direction[]).includes(d)) {
                 rebuilt[d] = e.target;
               }
             }
@@ -184,10 +189,19 @@ function App() {
   );
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+    if (node.type === 'areaGroup') {
+      // Extract prefix from node id like "area-jz"
+      const prefix = node.id.replace('area-', '');
+      setSelectedAreaPrefix(prefix);
+      setSelectedNodeId(null);
+      setActivePanel('area');
+      return;
+    }
     setSelectedNodeId((prev) => {
       if (prev !== node.id) setEditorKey((k) => k + 1);
       return node.id;
     });
+    setSelectedAreaPrefix(null);
     setActivePanel('scene');
   }, []);
 
@@ -196,15 +210,20 @@ function App() {
     setActivePanel(null);
   }, []);
 
-  const addScene = useCallback(() => {
-    const id = `scene_${idCounter.current++}`;
+  const addScene = useCallback((areaPrefix: string) => {
+    const id = `${areaPrefix}_scene_${idCounter.current++}`;
+
+    // Find the area group node to place the new scene inside it
+    const groupNode = nodes.find(n => n.id === `area-${areaPrefix}`);
+
     const newNode: Node = {
       id,
       type: 'sceneNode',
       position: {
-        x: Math.round((Math.random() * 400 + 200) / 20) * 20,
-        y: Math.round((Math.random() * 400 + 200) / 20) * 20,
+        x: Math.round((Math.random() * 300 + 50) / 20) * 20,
+        y: Math.round((Math.random() * 300 + 80) / 20) * 20,
       },
+      ...(groupNode ? { parentId: `area-${areaPrefix}`, extent: 'parent' as const } : {}),
       width: 180,
       height: 100,
       data: {
@@ -220,7 +239,35 @@ function App() {
       },
     };
     setNodes((nds) => [...nds, newNode]);
-  }, [setNodes]);
+  }, [setNodes, nodes]);
+
+  const addArea = useCallback((info: AreaInfo) => {
+    registerArea(info);
+    // Find rightmost existing area group to place new one next to it
+    let maxRight = 0;
+    nodes.forEach(n => {
+      if (n.type === 'areaGroup') {
+        const right = (n.position?.x ?? 0) + (parseFloat(String(n.style?.width ?? 0)) || 400);
+        if (right > maxRight) maxRight = right;
+      }
+    });
+
+    const groupNode: Node = {
+      id: `area-${info.prefix}`,
+      type: 'areaGroup',
+      position: { x: maxRight + 200, y: 0 },
+      data: { label: info.label },
+      style: {
+        width: 300,
+        height: 260,
+        border: '2px dashed rgba(212, 165, 116, 0.5)',
+        borderRadius: 12,
+        background: 'rgba(45, 45, 68, 0.3)',
+        padding: 0,
+      },
+    };
+    setNodes((nds) => [...nds, groupNode]);
+  }, [setNodes, nodes]);
 
   const updateScene = useCallback(
     (sceneId: string, updatedScene: Scene) => {
@@ -348,6 +395,7 @@ function App() {
     <div className="editor-container">
       <Toolbar
         onAddScene={addScene}
+        onAddArea={addArea}
         onExport={handleExport}
         onShowNpcs={showNpcPanel}
         onShowItems={showItemPanel}
@@ -375,8 +423,8 @@ function App() {
           >
             <Controls />
             <MiniMap
-              nodeColor="#d4a574"
-              nodeStrokeColor="#8b7355"
+              nodeColor={(node) => node.type === 'areaGroup' ? 'transparent' : '#d4a574'}
+              nodeStrokeColor={(node) => node.type === 'areaGroup' ? 'transparent' : '#8b7355'}
               maskColor="rgba(0, 0, 0, 0.6)"
               style={{ width: 180, height: 130 }}
               pannable
@@ -389,6 +437,17 @@ function App() {
             />
           </ReactFlow>
         </div>
+        {activePanel === 'area' && selectedAreaPrefix && (
+          <AreaEditor
+            areaPrefix={selectedAreaPrefix}
+            scenes={Object.fromEntries(
+              nodes
+                .filter(n => n.type === 'sceneNode')
+                .map(n => [n.id, n.data.scene as Scene])
+            )}
+            onClose={() => { setSelectedAreaPrefix(null); setActivePanel(null); }}
+          />
+        )}
         {activePanel === 'scene' && selectedNode && (
           <SceneEditor
             key={editorKey}
