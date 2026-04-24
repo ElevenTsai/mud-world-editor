@@ -29,7 +29,7 @@ import {
 } from './utils/mapConverter';
 import { DEFAULT_WORLD } from './utils/defaultScenes';
 import { loadWorld } from './lib/db';
-import { registerArea, type AreaInfo } from './utils/areaConfig';
+import { registerArea, getAreaPrefix, type AreaInfo } from './utils/areaConfig';
 import type { Scene, Direction, NpcTemplate, ItemTemplate, WorldData } from './types/map';
 import './App.css';
 
@@ -115,8 +115,9 @@ function App() {
       const dir = connection.sourceHandle.replace('-source', '') as Direction;
       const reverseDir = OPPOSITE_DIRECTION[dir];
       const isVertical = dir === 'up' || dir === 'down';
-      const edgeColor = isVertical ? '#7eb8da' : '#d4a574';
-      const dashArray = isVertical ? '6 3' : undefined;
+      const isCrossArea = getAreaPrefix(connection.source!) !== getAreaPrefix(connection.target!);
+      const edgeColor = isCrossArea ? '#e07be0' : isVertical ? '#7eb8da' : '#d4a574';
+      const dashArray = isCrossArea ? '8 4' : isVertical ? '6 3' : undefined;
 
       setEdges((eds) => {
         let result = eds;

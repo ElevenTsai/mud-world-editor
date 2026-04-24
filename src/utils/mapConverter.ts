@@ -226,7 +226,9 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
         if (!edgeSet.has(edgeId)) {
           edgeSet.add(edgeId);
           const isVertical = dir === 'up' || dir === 'down';
-          const edgeColor = isVertical ? '#7eb8da' : '#d4a574';
+          const isCrossArea = getAreaPrefix(scene.id) !== getAreaPrefix(targetId);
+          const edgeColor = isCrossArea ? '#e07be0' : isVertical ? '#7eb8da' : '#d4a574';
+          const dashArray = isCrossArea ? '8 4' : isVertical ? '6 3' : undefined;
           edges.push({
             id: edgeId,
             source: scene.id,
@@ -235,7 +237,7 @@ export function scenesToFlow(scenes: Record<string, Scene>): {
             targetHandle: `${OPPOSITE_DIRECTION[dir as Direction]}-target`,
             markerStart: { type: MarkerType.ArrowClosed, color: edgeColor },
             markerEnd: { type: MarkerType.ArrowClosed, color: edgeColor },
-            style: { stroke: edgeColor, strokeWidth: 2, strokeDasharray: isVertical ? '6 3' : undefined },
+            style: { stroke: edgeColor, strokeWidth: 2, strokeDasharray: dashArray },
           });
         }
       }
