@@ -114,6 +114,9 @@ function App() {
 
       const dir = connection.sourceHandle.replace('-source', '') as Direction;
       const reverseDir = OPPOSITE_DIRECTION[dir];
+      const isVertical = dir === 'up' || dir === 'down';
+      const edgeColor = isVertical ? '#7eb8da' : '#d4a574';
+      const dashArray = isVertical ? '6 3' : undefined;
 
       setEdges((eds) => {
         let result = eds;
@@ -127,9 +130,9 @@ function App() {
               target: connection.target!,
               sourceHandle: connection.sourceHandle,
               targetHandle: connection.targetHandle,
-              markerStart: { type: MarkerType.ArrowClosed, color: '#d4a574' },
-              markerEnd: { type: MarkerType.ArrowClosed, color: '#d4a574' },
-              style: { stroke: '#d4a574', strokeWidth: 2 },
+              markerStart: { type: MarkerType.ArrowClosed, color: edgeColor },
+              markerEnd: { type: MarkerType.ArrowClosed, color: edgeColor },
+              style: { stroke: edgeColor, strokeWidth: 2, strokeDasharray: dashArray },
             },
             result,
           );
@@ -145,9 +148,9 @@ function App() {
               target: connection.source!,
               sourceHandle: reverseHandle,
               targetHandle: `${dir}-target`,
-              markerStart: { type: MarkerType.ArrowClosed, color: '#d4a574' },
-              markerEnd: { type: MarkerType.ArrowClosed, color: '#d4a574' },
-              style: { stroke: '#d4a574', strokeWidth: 2 },
+              markerStart: { type: MarkerType.ArrowClosed, color: edgeColor },
+              markerEnd: { type: MarkerType.ArrowClosed, color: edgeColor },
+              style: { stroke: edgeColor, strokeWidth: 2, strokeDasharray: dashArray },
             },
             result,
           );
